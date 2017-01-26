@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Log.d("onCreate", "invoked");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
@@ -83,6 +84,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                Log.d("TAG", "onEditorAction invoked");
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
@@ -341,7 +343,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 conn.setDoInput(true);
                 conn.setUseCaches(false);
                 conn.setDefaultUseCaches(false);
-                strCookie = conn.getHeaderField("Set-Cookie");
+                //strCookie = conn.getHeaderField("Set-Cookie");
 
                 OutputStream os = conn.getOutputStream();
                 os.write(message.getBytes("UTF-8"));
