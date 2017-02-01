@@ -31,13 +31,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -203,12 +207,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        //return email.contains("@");
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 3;
     }
 
     /**
@@ -330,6 +335,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 builder.setLength(0);
         }
 
+
+        private String getPostString()  {
+            StringBuilder result = new StringBuilder();
+            boolean first = true;
+
+            try  {
+                result.append(URLEncoder.encode("email", "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(mEmail, "UTF-8"));
+                result.append("&");
+                result.append(URLEncoder.encode("password", "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(mPassword, "UTF-8"));
+            } catch (UnsupportedEncodingException ue)  {
+                ue.printStackTrace();
+            } catch (Exception e)  {
+                e.printStackTrace();
+            }
+            return result.toString();
+        }
+
+
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
@@ -343,13 +370,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 conn.setDoInput(true);
                 conn.setUseCaches(false);
                 conn.setDefaultUseCaches(false);
-                //strCookie = conn.getHeaderField("Set-Cookie");
 
                 OutputStream os = conn.getOutputStream();
-                os.write(message.getBytes("UTF-8"));
-                os.flush();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                bw.write(getPostString());
+                bw.flush();
+                bw.close();
+                //os.write(message.getBytes("UTF-8"));
+                //os.flush();
                 os.close();
-                //InputStream is = conn.getInputStream();
 
                 builder = new StringBuilder();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"), conn.getContentLength());
@@ -362,6 +391,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 //result = builder.toString();
                 //Log.d("result is: ", result);
                 Log.d("Builder is ", builder.toString());
+
+                strCookie = conn.getHeaderField("Set-Cookie");
 
 
                 // Simulate network access.
